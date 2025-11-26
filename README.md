@@ -7,7 +7,7 @@ Garpinger's Trade-Off Diagram Toolbox for PID Control Design
 A MATLAB project implementing Garpinger’s trade-off diagram approach for PID controller tuning and performance analysis. The project provides core functions for trade-off visualization, a live script showcasing a real-world field study, and a detailed explanation of the underlying theory.
 
 ## Installation
-Download the Package Toolbox and install them on Matlab.
+Download the Package Toolbox and install them on Matlab R2025a or later.
 Alternatively, the Matlab project can be opened. The Toolbox will then also be available. 
 
 ## Usage
