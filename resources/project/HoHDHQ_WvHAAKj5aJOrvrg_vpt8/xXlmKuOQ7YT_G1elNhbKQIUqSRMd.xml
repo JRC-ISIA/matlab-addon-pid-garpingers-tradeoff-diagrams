@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Info description="A MATLAB project implementing Garpinger’s trade-off diagram approach for PID controller tuning and performance analysis. The project provides core functions for trade-off visualization, a live script showcasing a real-world field study, and a detailed explanation of the underlying theory."/>
