@@ -13,7 +13,7 @@ Alternatively, the Matlab project can be opened. The Toolbox will then also be a
 ## Usage
 The recommended entry point for using this toolbox is the Live Script ``Getting Started``. After successfully installing the Toolbox, it will open automatically and provide a step-by-step introduction to the Toolbox.
 
-Another option is to open the Levie script ``FieldstudyTradeoff``. This script demonstrates a complete field study conducted on a DC motor. It includes a structured description of the study setup, followed by the application of core functions provided by the toolbox.
+Another option is to open the Live script ``FieldstudyTradeoff``. This script demonstrates a complete field study conducted on a DC motor. It includes a structured description of the study setup, followed by the application of core functions provided by the toolbox.
 
 The script serves both as a practical example and as a template for adapting the methodology to other systems. It is particularly suitable for users who prefer a guided, interactive approach to exploring the toolbox's capabilities.
 
