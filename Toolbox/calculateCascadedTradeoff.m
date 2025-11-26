@@ -127,12 +127,12 @@ end
 Pi = sysPi;
 Po = sysPo;
 Pil = Pi*Ci/(1+Pi*Ci);
-P = Pil*Po;
+P = Pil*Po; %#ok<NASGU>
 
 
 %% Detect plant type (proportional, integral)
 
-sys = minreal(ss(P));
+[~, sys] = evalc('minreal(ss(P))');
 sysDeg = length(find(abs(pole(sys)) < 10^-4));
 
 switch sysDeg
@@ -194,7 +194,7 @@ for ilX = 1:nX
         
         % Compute transfer functions 
         S = (1 / (1 + Co * P));
-        T = (P * Co / (1 + Co * P));
+        T = (P * Co / (1 + Co * P)); %#ok<NASGU>
 
         Ger = pade(S);
         Pid = Pi / (1 + Pi * Ci);
@@ -207,8 +207,8 @@ for ilX = 1:nX
         if data.stabMat(ilY, ilX) 
             
             % Robustness (Ms, Mt, robMat)      
-            Ms = computeM(S);
-            Mt = computeM(T);         
+            [~, Ms] = evalc('computeM(S)');
+            [~, Mt] = evalc('computeM(T)');         
             data.robMat(ilY, ilX) = max(Ms, Mt);
 
             if data.robMat(ilY, ilX) <= 1
