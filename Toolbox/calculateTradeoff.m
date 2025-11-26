@@ -166,7 +166,7 @@ for ilX = 1:nX
         
         % Compute transfer functions 
         S = (1 / (1 + C * P));
-        T = (P * C / (1 + C * P));      
+        T = (P * C / (1 + C * P));      %#ok<NASGU>
         Ger = pade(S);
         Ged = pade(-P / (1 + C * P));
 
