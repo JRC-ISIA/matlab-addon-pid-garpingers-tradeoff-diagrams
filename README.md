@@ -11,7 +11,7 @@ Download the Package Toolbox and install them on Matlab.
 Alternatively, the Matlab project can be opened. The Toolbox will then also be available. 
 
 ## Usage
-The recommended entry point for using this toolbox is the Live Script ``Getting Started``. After successfully installing the Toolbox, it will open automatically and provide a step-by-step introduction to the Toolbox.
+The recommended entry point for using this toolbox is the Live Script ``GettingStarted``. After successfully installing the Toolbox, it will open automatically and provide a step-by-step introduction to the Toolbox.
 
 Another option is to open the Live script ``FieldstudyTradeoff``. This script demonstrates a complete field study conducted on a DC motor. It includes a structured description of the study setup, followed by the application of core functions provided by the toolbox.
 
