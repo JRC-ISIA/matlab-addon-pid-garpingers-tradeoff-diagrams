@@ -7,8 +7,28 @@ Garpinger's Trade-Off Diagram Toolbox for PID Control Design
 A MATLAB project implementing Garpinger’s trade-off diagram approach for PID controller tuning and performance analysis. The project provides core functions for trade-off visualization, a live script showcasing a real-world field study, and a detailed explanation of the underlying theory.
 
 ## Installation
-Download the Package Toolbox and install them on Matlab R2025a or later.
-Alternatively, the Matlab project can be opened. The Toolbox will then also be available. 
+The Toolbox is available for Matlab R2025a or later.
+It is provided via
+
+Option 1:
+a) From Matlab -> Apps -> Get More Apps -> Search for "Trade-Off Diagram Toolbox for PID Control Design" -> Add -> Add to Matlab
+
+This will download the toolbox to your local installation and set the Matlab path appropriately.
+
+Option 2:
+a) From Matlab -> Apps -> Get More Apps -> Search for "Trade-Off Diagram Toolbox for PID Control Design" -> Add -> Download Only
+b) extract the contents of the downloaded zip-archive to a local folder
+c) Either open the Matlab-project file "TradeoffToolbox.prj" or set the Matlab Path to include
+   - JRC-ISIA-matlab-addon-pid-garpingers-tradeoff-diagrams-VERSION
+   - JRC-ISIA-matlab-addon-pid-garpingers-tradeoff-diagrams-VERSION/Toolbox
+   - JRC-ISIA-matlab-addon-pid-garpingers-tradeoff-diagrams-VERSION/Toolbox/Helpers
+   - JRC-ISIA-matlab-addon-pid-garpingers-tradeoff-diagrams-VERSION/Toolbox/doc
+   - JRC-ISIA-matlab-addon-pid-garpingers-tradeoff-diagrams-VERSION/Toolbox/Examples
+   - JRC-ISIA-matlab-addon-pid-garpingers-tradeoff-diagrams-VERSION/Toolbox/Data
+
+Option 3:
+a) go to https://www.mathworks.com/matlabcentral/fileexchange/ -> search for "Trade-Off Diagram Toolbox for PID Control Design" and download the provided zip-archive
+b)+c): see Option 2
 
 ## Usage
 The recommended entry point for using this toolbox is the Live Script ``GettingStarted``. After successfully installing the Toolbox, it will open automatically and provide a step-by-step introduction to the Toolbox.
