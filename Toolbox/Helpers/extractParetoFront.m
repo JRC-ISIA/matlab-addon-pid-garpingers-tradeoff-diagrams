@@ -76,6 +76,23 @@ if nr ~= numel(ky) || nc ~= numel(kx)
           nr, nc, numel(ky), numel(kx));
 end
 
+finiteMask = isfinite(robMat);          % Logical mask for finite values
+if ~any(finiteMask, 'all')
+    warning('Robustness matrix contains no finite values. Pareto front is not plotted.');
+    paretoFront = [];
+    foundOptimum = false;
+    return
+end
+
+finiteMask = isfinite(perfMat);          % Logical mask for finite values
+if ~any(finiteMask, 'all')
+    warning('Performance matrix contains no finite values. Pareto front is not plotted.');
+    paretoFront = [];
+    foundOptimum = false;
+    return
+end
+
+
 % Find maximum robustness level
 szRobMat = size(robMat);
 [~, minPerfIndex] = min(perfMat, [], 'all', 'omitnan');

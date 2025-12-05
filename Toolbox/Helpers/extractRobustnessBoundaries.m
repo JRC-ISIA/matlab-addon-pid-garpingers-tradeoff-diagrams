@@ -48,7 +48,7 @@ C = contourc(x, y, Mmasked, levels);
 % Parse contour matrix C into segments
 segments = parseContourMatrix(C);
 if isempty(segments)
-    warning("No robustness boundary found");
+    warning("No robustness boundary found. Robustness boundaries are not plotted.");
     return;
 end
 

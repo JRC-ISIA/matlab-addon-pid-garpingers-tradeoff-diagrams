@@ -227,6 +227,11 @@ figSetTrack.Position(3:4) = [400 400];
 fig = [figDistRej, figSetTrack];
 ax = [axDistRej, axSetTrack];
 
+pStab = [matlab.graphics.GraphicsPlaceholder, matlab.graphics.GraphicsPlaceholder];
+pRob = [matlab.graphics.GraphicsPlaceholder, matlab.graphics.GraphicsPlaceholder];
+pPerf = [matlab.graphics.GraphicsPlaceholder, matlab.graphics.GraphicsPlaceholder];
+pPfDr = [matlab.graphics.GraphicsPlaceholder, matlab.graphics.GraphicsPlaceholder];
+pPfSt = [matlab.graphics.GraphicsPlaceholder, matlab.graphics.GraphicsPlaceholder];
 
 switch plotType
     case "kp-ki"
@@ -379,13 +384,17 @@ end
 % Draw pareto fronts
 for il = 1:2
     figure(fig(il))
-    pPfDr(il) = plot(paretoDistRej(1,:), paretoDistRej(2,:), 'g', 'DisplayName', ''); %#ok<AGROW>
-    if foundParetoDistRejOptimum
-        plot(paretoDistRej(1,end), paretoDistRej(2,end), 'go', 'DisplayName', '');
+    if ~isempty(paretoDistRej)
+        pPfDr(il) = plot(paretoDistRej(1,:), paretoDistRej(2,:), 'g', 'DisplayName', ''); %#ok<AGROW>
+        if foundParetoDistRejOptimum
+            plot(paretoDistRej(1,end), paretoDistRej(2,end), 'go', 'DisplayName', '');
+        end
     end
-    pPfSt(il) = plot(paretoSetTrack(1,:), paretoSetTrack(2,:), 'm', 'DisplayName', ''); %#ok<AGROW>
-    if foundParetoSetTrackOptimum
-        plot(paretoSetTrack(1,end), paretoSetTrack(2,end), 'mo', 'DisplayName', '');
+    if ~isempty(paretoSetTrack)
+        pPfSt(il) = plot(paretoSetTrack(1,:), paretoSetTrack(2,:), 'm', 'DisplayName', ''); %#ok<AGROW>
+        if foundParetoSetTrackOptimum
+            plot(paretoSetTrack(1,end), paretoSetTrack(2,end), 'mo', 'DisplayName', '');
+        end
     end
 end
 
@@ -394,27 +403,27 @@ for il = 1:2
     pTradeoff = [];
     strTradeoff = {};
     
-    if ~isempty(pStab(il))
+    if ~isempty(pStab(il)) & ~isequal(pStab(il), matlab.graphics.GraphicsPlaceholder)
         pTradeoff = [pTradeoff pStab(il)]; %#ok<AGROW>
         strTradeoff{end + 1} = 'Stable system'; %#ok<AGROW>
     end
 
-    if ~isempty(pRob(il))
+    if ~isempty(pRob(il)) & ~isequal(pRob(il), matlab.graphics.GraphicsPlaceholder)
         pTradeoff = [pTradeoff pRob(il)]; %#ok<AGROW>
         strTradeoff{end + 1} = 'Robustness contour lines ($M_\mathrm{st}$)'; %#ok<AGROW>
     end
 
-    if ~isempty(pPerf(il))
+    if ~isempty(pPerf(il)) & ~isequal(pPerf(il), matlab.graphics.GraphicsPlaceholder)
         pTradeoff = [pTradeoff pPerf(il)]; %#ok<AGROW>
         strTradeoff{end + 1} = 'Performance contour lines ($IAE$)'; %#ok<AGROW>
     end
 
-    if ~isempty(pPfDr(il))
+    if ~isempty(pPfDr(il)) & ~isequal(pPfDr(il), matlab.graphics.GraphicsPlaceholder)
         pTradeoff = [pTradeoff pPfDr(il)]; %#ok<AGROW>
         strTradeoff{end + 1} = 'Pareto front (disturbance rejection)'; %#ok<AGROW>
     end
 
-    if ~isempty(pPfSt(il))
+    if ~isempty(pPfSt(il)) & ~isequal(pPfSt(il), matlab.graphics.GraphicsPlaceholder)
         pTradeoff = [pTradeoff pPfSt(il)]; %#ok<AGROW>
         strTradeoff{end + 1} = 'Pareto front (setpoint tracking)'; %#ok<AGROW>
     end

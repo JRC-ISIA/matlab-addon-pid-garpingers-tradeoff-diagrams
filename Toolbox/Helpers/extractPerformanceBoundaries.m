@@ -26,7 +26,9 @@ end
 % Calculate levels
 finiteMask = isfinite(I);          % Logical mask for finite values
 if ~any(finiteMask, 'all')
-    error('Matrix contains no finite values.');
+    warning('Performance matrix contains no finite values. Performance boundaries are not plotted.');
+    segments = {};
+    return
 end
 
 % Replace Inf with NaN so they are ignored by min
