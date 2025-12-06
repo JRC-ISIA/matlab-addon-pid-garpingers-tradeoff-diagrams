@@ -45,6 +45,10 @@ function data = calculateCascadedTradeoff(Pi, Po, Ci, kp, ki, kd, opts)
 %       (Integrated absolute error for a disturbance unit step)
 %       data.perfMatSetTrack - Performance matrix for setpoint tracking 
 %       (Integrated absolute error for a setpoint unit step)
+%       data.signedPerfMatDistRej - Signed performance matrix for disturbance rejection 
+%       (Integrated error for a disturbance unit step)
+%       data.signedPerfMatSetTrack - Signed performance matrix for setpoint tracking 
+%       (Integrated error for a setpoint unit step)
 %
 % Example:
 %   Pi = tf(1, [1 2 1], 'IoDelay', 0.5);  % User-defined inner loop plant model
@@ -166,6 +170,8 @@ data.stabMat = zeros(nY, nX);
 data.robMat = NaN(nY, nX);
 data.perfMatDistRej = Inf(nY, nX);
 data.perfMatSetTrack = Inf(nY, nX);
+data.signedPerfMatDistRej = NaN(nY, nX);
+data.signedPerfMatSetTrack = NaN(nY, nX);
 
 
 %% Calculate stability, data.robMat & data.perfMatDistRej matrices
@@ -216,8 +222,9 @@ for ilX = 1:nX
             end
 
             % IAE for setpoint tracking and disturbance rejection
-            data.perfMatDistRej(ilY, ilX) = computeIae(Ged);
-            data.perfMatSetTrack(ilY, ilX) = computeIae(Ger);
+            [~, data.perfMatDistRej(ilY, ilX), data.signedPerfMatDistRej(ilY, ilX)] = ...
+                evalc('computeIae(Ged)');
+            [~, data.perfMatSetTrack(ilY, ilX), data.signedPerfMatSetTrack(ilY, ilX)] = evalc('computeIae(Ger)');
         end
         
     end

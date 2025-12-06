@@ -113,12 +113,16 @@ if isempty(data.robMat)
     error("Field 'robMat' must be a nonempty matrix")
 end
 
+enablePlotDistRej = true;
 if isempty(data.perfMatDistRej)
-    error("Field 'perfMatDistRej' must be a nonempty matrix")
+    warning("Plotting trade-off diagram for disturbance rejection is skipped because no performance lines has be identified.")
+    enablePlotDistRej = false;
 end
 
+enablePlotSetTrack = true;
 if isempty(data.perfMatSetTrack)
-    error("Field 'perfMatSetTrack' must be a nonempty matrix")
+    warning("Plotting trade-off diagram for setpoint tracking is skipped because no performance lines has be identified.")
+    enablePlotSetTrack = false;
 end
 
 
@@ -186,7 +190,7 @@ switch plotType
         matrices = {data.stabMat, data.robMat, data.perfMatDistRej, data.perfMatSetTrack};
         names    = {'stabMat','robMat','perfMatDistRej','perfMatSetTrack'};
         for i = 1:numel(matrices)
-            if ~isequal(size(matrices{i}), expectedSz)
+            if ~isequal(size(matrices{i}), expectedSz) && ~isempty(matrices{i})
                 error('garpinger:SizeMismatch', ...
                     '%s must be sized [%d x %d] for plot type "kp-ki" (got [%d x %d]).', ...
                     names{i}, expectedSz(1), expectedSz(2), size(matrices{i},1), size(matrices{i},2));
@@ -198,7 +202,7 @@ switch plotType
         matrices = {data.stabMat, data.robMat, data.perfMatDistRej, data.perfMatSetTrack};
         names    = {'stabMat','robMat','perfMatDistRej','perfMatSetTrack'};
         for i = 1:numel(matrices)
-            if ~isequal(size(matrices{i}), expectedSz)
+            if ~isequal(size(matrices{i}), expectedSz) && ~isempty(matrices{i})
                 error('garpinger:SizeMismatch', ...
                     '%s must be sized [%d x %d] for plot type "kd-kp" (got [%d x %d]).', ...
                     names{i}, expectedSz(1), expectedSz(2), size(matrices{i},1), size(matrices{i},2));
@@ -212,18 +216,43 @@ end
 
 % Prepare figures
 if opts.ExternalFigureWindow
-    figDistRej  = figure('Color', 'w', 'WindowStyle', 'normal', 'Visible', 'on');
-    axDistRej = axes('Color', [0.7 0.7 0.7]);  % slightly lighter gray
-    figSetTrack = figure('Color', 'w', 'WindowStyle', 'normal', 'Visible', 'on');
-    axSetTrack = axes('Color', [0.7 0.7 0.7]);  % slightly lighter gray
+    if enablePlotDistRej
+        figDistRej  = figure('Color', 'w', 'WindowStyle', 'normal', 'Visible', 'on');
+        axDistRej = axes('Color', [0.7 0.7 0.7]);  % slightly lighter gray
+        figDistRej.Position(3:4) = [400 400];
+    else
+        figDistRej = matlab.graphics.GraphicsPlaceholder;
+        axDistRej = matlab.graphics.GraphicsPlaceholder;
+    end
+    if enablePlotSetTrack
+        figSetTrack = figure('Color', 'w', 'WindowStyle', 'normal', 'Visible', 'on');
+        axSetTrack = axes('Color', [0.7 0.7 0.7]);  % slightly lighter gray
+        figSetTrack.Position(3:4) = [400 400];
+    else
+        figSetTrack = matlab.graphics.GraphicsPlaceholder;
+        axSetTrack = matlab.graphics.GraphicsPlaceholder;
+    end
 else
-    figDistRej  = figure('Color', 'w', 'WindowStyle', 'normal');
-    axDistRej = axes('Color', [0.7 0.7 0.7]);  % slightly lighter gray
-    figSetTrack = figure('Color', 'w', 'WindowStyle', 'normal');
-    axSetTrack = axes('Color', [0.7 0.7 0.7]);  % slightly lighter gray
+    if enablePlotDistRej
+        figDistRej  = figure('Color', 'w', 'WindowStyle', 'normal');
+        axDistRej = axes('Color', [0.7 0.7 0.7]);  % slightly lighter gray
+        figDistRej.Position(3:4) = [400 400];
+    else
+        figDistRej = matlab.graphics.GraphicsPlaceholder;
+        axDistRej = matlab.graphics.GraphicsPlaceholder;
+    end
+    if enablePlotSetTrack
+        figSetTrack = figure('Color', 'w', 'WindowStyle', 'normal');
+        axSetTrack = axes('Color', [0.7 0.7 0.7]);  % slightly lighter gray
+        figSetTrack.Position(3:4) = [400 400];
+    else
+        figSetTrack = matlab.graphics.GraphicsPlaceholder;
+        axSetTrack = matlab.graphics.GraphicsPlaceholder;
+    end
 end
-figDistRej.Position(3:4) = [400 400];
-figSetTrack.Position(3:4) = [400 400];
+
+
+
 fig = [figDistRej, figSetTrack];
 ax = [axDistRej, axSetTrack];
 
@@ -238,12 +267,19 @@ switch plotType
         assert(isscalar(data.kd), 'kd must be a scalar if ki is to be plotted via kp.');
         kx = data.kp;
         ky = data.ki;
-        figure(figDistRej)
-        title("Disturbance Rejection ($K_\mathrm{D}=" + string(data.kd) + "$)", 'Interpreter', 'latex');
-        figure(figSetTrack)
-        title("Setpoint Tracking ($K_\mathrm{D}=" + string(data.kd) + "$)", 'Interpreter', 'latex');
-        for il = 1:2
-            figure(fig(il))
+        if enablePlotDistRej
+            figure(figDistRej)
+            title("Disturbance Rejection ($K_\mathrm{D}=" + string(data.kd) + "$)", 'Interpreter', 'latex');
+        end
+        if enablePlotSetTrack
+            figure(figSetTrack)
+            title("Setpoint Tracking ($K_\mathrm{D}=" + string(data.kd) + "$)", 'Interpreter', 'latex');
+        end
+        for iFig = 1:2
+            if isequal(fig(iFig), matlab.graphics.GraphicsPlaceholder)
+                continue
+            end
+            figure(fig(iFig))
             xlim([min(data.kp), max(data.kp)])
             ylim([min(data.ki), max(data.ki)])
             xlabel('$K_\mathrm{P}$', 'Interpreter', 'latex')
@@ -255,12 +291,19 @@ switch plotType
         assert(isscalar(data.ki), 'ki must be a scalar if kp is to be plotted via kd.');
         kx = data.kd;
         ky = data.kp;
-        figure(figDistRej)
-        title("Disturbance Rejection ($K_\mathrm{I}=" + string(data.ki) + "$)", 'Interpreter', 'latex');
-        figure(figSetTrack)
-        title("Setpoint Tracking ($K_\mathrm{I}=" + string(data.ki) + "$)", 'Interpreter', 'latex');
-        for il = 1:2
-            figure(fig(il))
+        if enablePlotDistRej
+            figure(figDistRej)
+            title("Disturbance Rejection ($K_\mathrm{I}=" + string(data.ki) + "$)", 'Interpreter', 'latex');
+        end
+        if enablePlotSetTrack
+            figure(figSetTrack)
+            title("Setpoint Tracking ($K_\mathrm{I}=" + string(data.ki) + "$)", 'Interpreter', 'latex');
+        end
+        for iFig = 1:2
+            if isequal(fig(iFig), matlab.graphics.GraphicsPlaceholder)
+                continue
+            end
+            figure(fig(iFig))
             xlim([min(data.kd), max(data.kd)])
             ylim([min(data.kp), max(data.kp)])
             xlabel('$K_\mathrm{D}$', 'Interpreter', 'latex')
@@ -276,10 +319,13 @@ end
 
 stabSegs = extractStabilityBoundaries(data.stabMat, kx, ky);
 
-for il = 1:2
-    figure(fig(il))
+for iFig = 1:2
+    if isequal(fig(iFig), matlab.graphics.GraphicsPlaceholder)
+        continue
+    end
+    figure(fig(iFig))
     pStabCell = cellfun(@(seg) patch(seg(1,:), seg(2,:), 'white', 'FaceAlpha', 1.0, 'DisplayName', ''), stabSegs); 
-    pStab(il) = pStabCell(1); %#ok<AGROW>
+    pStab(iFig) = pStabCell(1); 
 end
 
 
@@ -294,8 +340,14 @@ kyFine = linspace(min(ky), max(ky), nYFine);
 [kxMesh, kyMesh] = meshgrid(kx, ky);
 [kxFineMesh, kyFineMesh] = meshgrid(kxFine, kyFine);
 robMatFine = interp2(kxMesh, kyMesh, data.robMat, kxFineMesh, kyFineMesh);
-perfMatDistRejFine = interp2(kxMesh, kyMesh, data.perfMatDistRej, kxFineMesh, kyFineMesh);
-perfMatSetTrackFine = interp2(kxMesh, kyMesh, data.perfMatSetTrack, kxFineMesh, kyFineMesh);
+if ~isempty(data.perfMatDistRej)
+    perfMatDistRejFine = interp2(kxMesh, kyMesh, data.perfMatDistRej, kxFineMesh, kyFineMesh);
+    signedPerfMatDistRejFine = interp2(kxMesh, kyMesh, data.signedPerfMatDistRej, kxFineMesh, kyFineMesh);
+end
+if ~isempty(data.perfMatSetTrack)
+    perfMatSetTrackFine = interp2(kxMesh, kyMesh, data.perfMatSetTrack, kxFineMesh, kyFineMesh);
+    signedPerfMatSetTrackFine = interp2(kxMesh, kyMesh, data.signedPerfMatSetTrack, kxFineMesh, kyFineMesh);
+end
 
 
 %% Plot robustness lines
@@ -305,6 +357,9 @@ robSegs = extractRobustnessBoundaries(robMatFine, kxFine, kyFine, opts.Robustnes
 
 % Draw robustness lines
 for iFig = 1:2
+    if isequal(fig(iFig), matlab.graphics.GraphicsPlaceholder)
+        continue
+    end
     figure(fig(iFig))
     level = 0;
     for i = 1:numel(robSegs)
@@ -314,7 +369,7 @@ for iFig = 1:2
         y = robSegs{i}(2,:);
     
         % Plot the line and store color for consistent labeling
-        pRob(iFig) = plot(ax(iFig), x, y, 'r', 'DisplayName', ''); %#ok<AGROW>
+        pRob(iFig) = plot(ax(iFig), x, y, 'r', 'DisplayName', ''); 
         col = pRob(iFig).Color;
         
         % Check whether the robustness value has already been labeled
@@ -337,11 +392,18 @@ end
 %% Plot performance lines
 
 % Extract robustnes lines
-perfSegs{1} = extractPerformanceBoundaries(perfMatDistRejFine, kxFine, kyFine, opts.NumberOfPerformanceLines);
-perfSegs{2} = extractPerformanceBoundaries(perfMatSetTrackFine, kxFine, kyFine, opts.NumberOfPerformanceLines);
+if enablePlotDistRej
+    perfSegs{1} = extractPerformanceBoundaries(perfMatDistRejFine, kxFine, kyFine, opts.NumberOfPerformanceLines);
+end
+if enablePlotSetTrack
+    perfSegs{2} = extractPerformanceBoundaries(perfMatSetTrackFine, kxFine, kyFine, opts.NumberOfPerformanceLines);
+end
 
 % Draw robustness lines
 for iFig = 1:2
+    if isequal(fig(iFig), matlab.graphics.GraphicsPlaceholder)
+        continue
+    end
     figure(fig(iFig))
     level = 0;
     for i = 1:numel(perfSegs{iFig})
@@ -351,7 +413,7 @@ for iFig = 1:2
         y = perfSegs{iFig}{i}(2,:);
     
         % Plot the line and store color for consistent labeling
-        pPerf(iFig) = plot(ax(iFig), x, y, 'b', 'DisplayName', ''); %#ok<AGROW>
+        pPerf(iFig) = plot(ax(iFig), x, y, 'b', 'DisplayName', ''); 
         col = pPerf(iFig).Color;
         
         % Check whether the robustness value has already been labeled
@@ -371,27 +433,38 @@ end
 %% Plot Pareto fronts
 
 % Compute pareto front
-[paretoDistRej, foundParetoDistRejOptimum] = ...
-    extractParetoFront(robMatFine, perfMatDistRejFine, kxFine, kyFine, ...
-    "SmoothMethod", opts.SmoothParetoFrontMethod, ...
-    "SmoothWindow", opts.SmoothParetoFrontWindow);
+paretoDistRej = [];
+foundParetoDistRejOptimum = false;
+if enablePlotDistRej
+    [paretoDistRej, foundParetoDistRejOptimum] = ...
+        extractParetoFront(robMatFine, perfMatDistRejFine, kxFine, kyFine, ...
+        "SmoothMethod", opts.SmoothParetoFrontMethod, ...
+        "SmoothWindow", opts.SmoothParetoFrontWindow);
+end
 
-[paretoSetTrack, foundParetoSetTrackOptimum] = ...
-    extractParetoFront(robMatFine, perfMatSetTrackFine, kxFine, kyFine, ...
-    "SmoothMethod", opts.SmoothParetoFrontMethod, ...
-    "SmoothWindow", opts.SmoothParetoFrontWindow);
+paretoSetTrack = [];
+foundParetoSetTrackOptimum = false;
+if enablePlotSetTrack
+    [paretoSetTrack, foundParetoSetTrackOptimum] = ...
+        extractParetoFront(robMatFine, perfMatSetTrackFine, kxFine, kyFine, ...
+        "SmoothMethod", opts.SmoothParetoFrontMethod, ...
+        "SmoothWindow", opts.SmoothParetoFrontWindow);
+end
 
 % Draw pareto fronts
-for il = 1:2
-    figure(fig(il))
+for iFig = 1:2
+    if isequal(fig(iFig), matlab.graphics.GraphicsPlaceholder)
+        continue
+    end    
+    figure(fig(iFig))
     if ~isempty(paretoDistRej)
-        pPfDr(il) = plot(paretoDistRej(1,:), paretoDistRej(2,:), 'g', 'DisplayName', ''); %#ok<AGROW>
+        pPfDr(iFig) = plot(paretoDistRej(1,:), paretoDistRej(2,:), 'g', 'DisplayName', ''); 
         if foundParetoDistRejOptimum
             plot(paretoDistRej(1,end), paretoDistRej(2,end), 'go', 'DisplayName', '');
         end
     end
     if ~isempty(paretoSetTrack)
-        pPfSt(il) = plot(paretoSetTrack(1,:), paretoSetTrack(2,:), 'm', 'DisplayName', ''); %#ok<AGROW>
+        pPfSt(iFig) = plot(paretoSetTrack(1,:), paretoSetTrack(2,:), 'm', 'DisplayName', ''); 
         if foundParetoSetTrackOptimum
             plot(paretoSetTrack(1,end), paretoSetTrack(2,end), 'mo', 'DisplayName', '');
         end
@@ -399,32 +472,35 @@ for il = 1:2
 end
 
 % Legend
-for il = 1:2
+for iFig = 1:2
+    if isequal(fig(iFig), matlab.graphics.GraphicsPlaceholder)
+        continue
+    end    
     pTradeoff = [];
     strTradeoff = {};
     
-    if ~isempty(pStab(il)) & ~isequal(pStab(il), matlab.graphics.GraphicsPlaceholder)
-        pTradeoff = [pTradeoff pStab(il)]; %#ok<AGROW>
+    if ~isempty(pStab(iFig)) & ~isequal(pStab(iFig), matlab.graphics.GraphicsPlaceholder)
+        pTradeoff = [pTradeoff pStab(iFig)]; %#ok<AGROW>
         strTradeoff{end + 1} = 'Stable system'; %#ok<AGROW>
     end
 
-    if ~isempty(pRob(il)) & ~isequal(pRob(il), matlab.graphics.GraphicsPlaceholder)
-        pTradeoff = [pTradeoff pRob(il)]; %#ok<AGROW>
+    if ~isempty(pRob(iFig)) & ~isequal(pRob(iFig), matlab.graphics.GraphicsPlaceholder)
+        pTradeoff = [pTradeoff pRob(iFig)]; %#ok<AGROW>
         strTradeoff{end + 1} = 'Robustness contour lines ($M_\mathrm{st}$)'; %#ok<AGROW>
     end
 
-    if ~isempty(pPerf(il)) & ~isequal(pPerf(il), matlab.graphics.GraphicsPlaceholder)
-        pTradeoff = [pTradeoff pPerf(il)]; %#ok<AGROW>
+    if ~isempty(pPerf(iFig)) & ~isequal(pPerf(iFig), matlab.graphics.GraphicsPlaceholder)
+        pTradeoff = [pTradeoff pPerf(iFig)]; %#ok<AGROW>
         strTradeoff{end + 1} = 'Performance contour lines ($IAE$)'; %#ok<AGROW>
     end
 
-    if ~isempty(pPfDr(il)) & ~isequal(pPfDr(il), matlab.graphics.GraphicsPlaceholder)
-        pTradeoff = [pTradeoff pPfDr(il)]; %#ok<AGROW>
+    if ~isempty(pPfDr(iFig)) & ~isequal(pPfDr(iFig), matlab.graphics.GraphicsPlaceholder)
+        pTradeoff = [pTradeoff pPfDr(iFig)]; %#ok<AGROW>
         strTradeoff{end + 1} = 'Pareto front (disturbance rejection)'; %#ok<AGROW>
     end
 
-    if ~isempty(pPfSt(il)) & ~isequal(pPfSt(il), matlab.graphics.GraphicsPlaceholder)
-        pTradeoff = [pTradeoff pPfSt(il)]; %#ok<AGROW>
+    if ~isempty(pPfSt(iFig)) & ~isequal(pPfSt(iFig), matlab.graphics.GraphicsPlaceholder)
+        pTradeoff = [pTradeoff pPfSt(iFig)]; %#ok<AGROW>
         strTradeoff{end + 1} = 'Pareto front (setpoint tracking)'; %#ok<AGROW>
     end
 
@@ -432,8 +508,8 @@ for il = 1:2
         'NumColumns', 1, ...
         'Interpreter', 'latex', ...
         'Location', 'northoutside')
-    ax(il).Layer = 'top';
-    ax(il).Box = 'on';
+    ax(iFig).Layer = 'top';
+    ax(iFig).Box = 'on';
 end
 
 end

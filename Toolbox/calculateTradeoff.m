@@ -38,6 +38,10 @@ function data = calculateTradeoff(plant, kp, ki, kd, opts)
 %       (Integrated absolute error for a disturbance unit step)
 %       data.perfMatSetTrack - Performance matrix for setpoint tracking 
 %       (Integrated absolute error for a setpoint unit step)
+%       data.signedPerfMatDistRej - Signed performance matrix for disturbance rejection 
+%       (Integrated error for a disturbance unit step)
+%       data.signedPerfMatSetTrack - Signed performance matrix for setpoint tracking 
+%       (Integrated error for a setpoint unit step)
 %
 % Example:
 %   plant = tf(1, [1 2 1], 'IoDelay', 0.5);  % User-defined plant model
@@ -119,6 +123,7 @@ switch sysDeg
         disp("Detected integral plant. Garpingers trade-off plots " + ...
             "are calculated for kp via kd (" + num2str(nY) + " x " + ...
             num2str(nX) + ").")
+        disp('Calculation of the trade-off diagram for disturbance rejection is skipped because no meaningful performance lines can be identified.')
         data.kp = linspace(0, kp, nY);
         data.ki = ki;
         data.kd = linspace(0, kd, nX);
@@ -136,8 +141,16 @@ P = sys;
 
 data.stabMat = false(nY, nX);
 data.robMat = NaN(nY, nX);
-data.perfMatDistRej = NaN(nY, nX);
 data.perfMatSetTrack = NaN(nY, nX);
+data.signedPerfMatSetTrack = NaN(nY, nX);
+if ~sysDeg
+    data.perfMatDistRej = NaN(nY, nX);
+    data.signedPerfMatDistRej = NaN(nY, nX);
+else
+    data.perfMatDistRej = [];
+    data.signedPerfMatDistRej = [];
+end
+
 
 
 %% Calculate stability, robMat & IAE matrices
@@ -168,8 +181,7 @@ for ilX = 1:nX
         S = (1 / (1 + C * P));
         T = (P * C / (1 + C * P));      %#ok<NASGU>
         Ger = pade(S);
-        Ged = pade(-P / (1 + C * P));
-
+        
         % Determine if closed loop models are stable
         data.stabMat(ilY, ilX) = isstable(Ger);
 
@@ -182,8 +194,13 @@ for ilX = 1:nX
             data.robMat(ilY, ilX) = max(Ms, Mt, "omitnan");
 
             % IAE for setpoint tracking and disturbance rejection
-            data.perfMatDistRej(ilY, ilX) = computeIae(Ged);
-            data.perfMatSetTrack(ilY, ilX) = computeIae(Ger);
+            if ~sysDeg
+                Ged = pade(-P / (1 + C * P)); %#ok<NASGU>
+                [~, data.perfMatDistRej(ilY, ilX), data.signedPerfMatDistRej(ilY, ilX)] = ...
+                    evalc('computeIae(Ged)');
+            end
+            [~, data.perfMatSetTrack(ilY, ilX), data.signedPerfMatSetTrack(ilY, ilX)] = ...
+                evalc('computeIae(Ger)');
 
         end
     end

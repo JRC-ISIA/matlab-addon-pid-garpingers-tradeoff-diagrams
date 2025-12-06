@@ -56,7 +56,7 @@ C = contourc(x, y, I, levels(~isnan(levels)));
 % Parse contour matrix C into segments
 segments = parseContourMatrix(C);
 if isempty(segments)
-    warning("No robustness boundary found");
+    warning("No performance boundary found");
     return;
 end
 
