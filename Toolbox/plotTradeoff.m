@@ -115,13 +115,13 @@ end
 
 enablePlotDistRej = true;
 if isempty(data.perfMatDistRej)
-    warning("Plotting trade-off diagram for disturbance rejection is skipped because no performance lines has be identified.")
+    warning("Plotting trade-off diagram for disturbance rejection is skipped because no performance lines has been identified.")
     enablePlotDistRej = false;
 end
 
 enablePlotSetTrack = true;
 if isempty(data.perfMatSetTrack)
-    warning("Plotting trade-off diagram for setpoint tracking is skipped because no performance lines has be identified.")
+    warning("Plotting trade-off diagram for setpoint tracking is skipped because no performance lines has been identified.")
     enablePlotSetTrack = false;
 end
 
