@@ -26,6 +26,8 @@ function data = calculateTradeoff(plant, kp, ki, kd, opts)
 %   Name-Value Pairs:
 %       ResolutionSpec - Either a numeric vector [nY nX] specifying the
 %       resolution, or a string: 'low', 'medium', 'high'.
+%       Tf - Time filter konstant for low pass filter of first order for 
+%         derivative part of PID controller
 %
 %   Outputs:
 %       data - Calculated design criteria (returned as struct)
@@ -63,6 +65,7 @@ arguments
     kd (1,1) double {mustBeFinite, mustBeNonempty}
     % Name-Value pairs:
     opts.ResolutionSpec = 'medium'
+    opts.Tf {mustBeGreaterThanOrEqual(opts.Tf, 0.0)} = 0.0
 end
 
 warning('off')
@@ -167,9 +170,9 @@ for ilX = 1:nX
 
         switch sysDeg
             case 0
-                C = data.kp(ilX) + data.ki(ilY) / s + data.kd * s;
+                C = data.kp(ilX) + data.ki(ilY) / s + data.kd * s / (1 * opts.Tf + 1);
             case 1
-                C = data.kp(ilY) + data.ki / s + data.kd(ilX) * s;
+                C = data.kp(ilY) + data.ki / s + data.kd(ilX) * s / (1 * opts.Tf + 1);
             otherwise
                 error("calculateTradeoff:UnsupportedPantType", ... 
                     "Unsupported plant type detected. Grapingers trade-off " + ...

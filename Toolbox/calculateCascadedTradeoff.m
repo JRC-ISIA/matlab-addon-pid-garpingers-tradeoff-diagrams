@@ -74,6 +74,7 @@ arguments
     kd (1,1) double {mustBeFinite, mustBeNonempty}
     % Name-Value pairs:
     opts.ResolutionSpec = 'medium'
+    opts.Tf {mustBeGreaterThanOrEqual(opts.Tf, 0.0)} = 0.0
 end
 
 warning('off')
@@ -188,9 +189,9 @@ for ilX = 1:nX
         
         switch sysDeg
             case 0
-                Co = data.kp(ilX) + data.ki(ilY) / s + data.kd * s;
+                Co = data.kp(ilX) + data.ki(ilY) / s + data.kd * s / (1 * opts.Tf + 1);
             case 1
-                Co = data.kp(ilY) + data.ki / s + data.kd(ilX) * s;
+                Co = data.kp(ilY) + data.ki / s + data.kd(ilX) * s / (1 * opts.Tf + 1);
             otherwise
                 error("calculateCascadedTradeoff:UnsupportedPantType", ... 
                     "Unsupported plant type detected. Grapingers trade-off " + ...
