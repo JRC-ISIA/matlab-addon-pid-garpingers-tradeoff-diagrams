@@ -7,13 +7,21 @@ function M = computeM(G)
 % OUTPUT:
 %   M - Robustness value M.
 
+M = NaN;
+
 Gpade = pade(G);
-if isproper(Gpade)
-    Gapprox = minreal(Gpade);
-else
-    Gapprox = Gpade;
+
+if ~isproper(Gpade)
+    return
 end
-H = freqresp(Gapprox);
+
+Gminreal = minreal(Gpade);
+
+if ~isstable(Gminreal)
+    return
+end
+
+H = freqresp(Gminreal);
 M = max(abs(H));
 if (M <= 1) || ~isfinite(M)
     M = NaN;
